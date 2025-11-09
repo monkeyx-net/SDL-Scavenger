@@ -149,7 +149,7 @@ jobs:
           echo "Contents of dist/${GAME_FOLDER}/:"
           ls -la dist/${GAME_EXE}
           cd dist
-          zip -r "../${GAME_EXE}.zip" .
+          zip -r "../${GAME_FOLDER}.zip" .
 
       - name: Upload PortMaster package
         uses: actions/upload-artifact@v4
