@@ -147,7 +147,7 @@ jobs:
           mv dist/${GAME_EXE}-arm64 dist/${GAME_FOLDER}/${GAME_EXE}.aarch64
           chmod +x dist/${GAME_FOLDER}/${GAME_EXE}.*
           echo "Contents of dist/${GAME_FOLDER}/:"
-          ls -la dist/${GAME_EXE}
+          ls -la dist/${GAME_FOLDER}
           cd dist
           zip -r "../${GAME_FOLDER}.zip" .
 
