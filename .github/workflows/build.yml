@@ -51,7 +51,7 @@ jobs:
           GAME_NAME=$(jq -r '.attr.title' "$PORT_JSON_PATH")
           GAME_ZIP=$(jq -r '.name' "$PORT_JSON_PATH")
           GAME_START=$(jq -r '.items[0]' "$PORT_JSON_PATH")
-          GAME_EXE="scavenger"
+          GAME_EXE="sdlscav"
           GAME_ICON="latest/$GAME_FOLDER/cover.png"
           echo "game_folder=$GAME_FOLDER" >> $GITHUB_OUTPUT
           echo "game_name=$GAME_NAME" >> $GITHUB_OUTPUT
