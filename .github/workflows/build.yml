@@ -51,7 +51,7 @@ jobs:
           GAME_NAME=$(jq -r '.attr.title' "$PORT_JSON_PATH")
           GAME_ZIP=$(jq -r '.name' "$PORT_JSON_PATH")
           GAME_START=$(jq -r '.items[0]' "$PORT_JSON_PATH")
-          GAME_EXE="shamogu"
+          GAME_EXE="scavenger"
           GAME_ICON="latest/$GAME_FOLDER/cover.png"
           echo "game_folder=$GAME_FOLDER" >> $GITHUB_OUTPUT
           echo "game_name=$GAME_NAME" >> $GITHUB_OUTPUT
@@ -99,8 +99,8 @@ jobs:
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: shamogu-linux-${{ matrix.arch }}
-          path: shamogu-linux-${{ matrix.arch }}.tar.gz
+          name: scavenger-linux-${{ matrix.arch }}
+          path: scavenger-linux-${{ matrix.arch }}.tar.gz
           retention-days: 7
 
   package:
@@ -115,7 +115,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          pattern: shamogu-linux-*
+          pattern: scavenger-linux-*
           merge-multiple: true
 
       - name: Extract binaries to correct locations
