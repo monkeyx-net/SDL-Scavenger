@@ -22,7 +22,7 @@ GAMEDIR=/$directory/ports/$GAMEBINARY
 exec > >(tee "$GAMEDIR/log.txt") 2>&1
 
 cd $GAMEDIR
-bind_directories ~/.local/share/$GAMEBINARY $GAMEDIR/conf
+bind_directories ~/.scavenger $GAMEDIR/conf
 if [ $DISPLAY_WIDTH -lt 1024 ] && [ $DISPLAY_HEIGHT -lt 768 ]; then
  XWIDTH="0.50"
 else
