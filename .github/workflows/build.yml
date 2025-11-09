@@ -82,9 +82,9 @@ jobs:
 
           go version
 
-      - name: Build Go binary
+      - name: Build binary
         run: |
-          go build -tags sdl
+          make
 
       - name: Strip and package binary
         run: |
