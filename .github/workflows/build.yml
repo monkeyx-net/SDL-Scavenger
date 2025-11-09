@@ -93,14 +93,14 @@ jobs:
           mkdir -p dist
           cp ${GAME_EXE} dist/${GAME_EXE}-${{ matrix.arch }}
           strip dist/${GAME_EXE}-${{ matrix.arch }} || true
-          tar -czf ${GAME_EXE}-linux-${{ matrix.arch }}.tar.gz -C dist ${GAME_EXE}-${{ matrix.arch }}
+          tar -czf ${GAME_FOLDER}-linux-${{ matrix.arch }}.tar.gz -C dist ${GAME_EXE}-${{ matrix.arch }}
           ls -lh *.tar.gz
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: scavenger-linux-${{ matrix.arch }}
-          path: scavenger-linux-${{ matrix.arch }}.tar.gz
+          name: ${{ steps.parse-json.outputs.game_folder }}-linux-${{ matrix.arch }}
+          path: ${{ steps.parse-json.outputs.game_folder }}-linux-${{ matrix.arch }}.tar.gz
           retention-days: 7
 
   package:
@@ -154,6 +154,6 @@ jobs:
       - name: Upload PortMaster package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ needs.build.outputs.game_exe }}-portmaster
-          path: ${{ needs.build.outputs.game_exe }}.zip
+          name: ${{ needs.build.outputs.game_folder }}-portmaster
+          path: ${{ needs.build.outputs.game_folder }}.zip
           retention-days: 7
