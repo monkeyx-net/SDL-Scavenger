@@ -75,12 +75,19 @@ jobs:
           sudo apt-get install -y build-essential cmake pkg-config wget tar golang-go \
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
             libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
-            sdl12-compat libpipewire-0.3-dev libfuse2 appstream make patchelf jq
+            libpipewire-0.3-dev libfuse2 appstream make patchelf jq
 
           echo "GOROOT=$(go env GOROOT)" >> $GITHUB_ENV
           echo "$(go env GOROOT)/bin" >> $GITHUB_PATH
 
-          go version
+      - name: Build SDL 1.2 compatibility layer
+        run: |
+          git clone https://github.com/libsdl-org/sdl12-compat.git
+          cd sdl12-compat
+          mkdir build && cd build
+          cmake ..
+          make
+          sudo make install
 
       - name: Build binary
         run: |
