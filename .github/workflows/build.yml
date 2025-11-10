@@ -89,14 +89,14 @@ jobs:
           sudo rm -rf /var/lib/apt/lists/*
 
       - name: Build SDL 1.2 compatibility layer
-      run: |
-        git clone https://github.com/libsdl-org/sdl12-compat.git
-        cd sdl12-compat
-        git checkout release-1.2.64
-        mkdir build && cd build
-        cmake ..
-        make
-        sudo make install
+        run: |
+          git clone https://github.com/libsdl-org/sdl12-compat.git
+          cd sdl12-compat
+          git checkout release-1.2.64
+          mkdir build && cd build
+          cmake ..
+          make
+          sudo make install
 
       - name: Build binary
         run: |
