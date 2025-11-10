@@ -18,7 +18,7 @@ source $controlfolder/control.txt
 get_controls
 
 GAMEBINARY=sdlscav
-GAMEDIR=/$directory/ports/$GAMEBINARY
+GAMEDIR=/$directory/ports/scavenger
 exec > >(tee "$GAMEDIR/log.txt") 2>&1
 
 cd $GAMEDIR
