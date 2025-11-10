@@ -23,11 +23,6 @@ exec > >(tee "$GAMEDIR/log.txt") 2>&1
 
 cd $GAMEDIR
 bind_directories ~/.scavenger $GAMEDIR/conf
-if [ $DISPLAY_WIDTH -lt 1024 ] && [ $DISPLAY_HEIGHT -lt 768 ]; then
- XWIDTH="0.50"
-else
- XWIDTH="1.00"
-fi
 $GPTOKEYB "$GAMEBINARY.${DEVICE_ARCH}" -c "./$GAMEBINARY.gptk" &
-SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig" ./$GAMEBINARY.${DEVICE_ARCH} -w $XWIDTH -h 1.00
+SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig" ./$GAMEBINARY.${DEVICE_ARCH}
 pm_finish

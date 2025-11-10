@@ -74,7 +74,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake pkg-config wget tar golang-go \
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
-            libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
+            libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
             libsdl1.2-compat libpipewire-0.3-dev libfuse2 appstream make patchelf jq
 
           echo "GOROOT=$(go env GOROOT)" >> $GITHUB_ENV
