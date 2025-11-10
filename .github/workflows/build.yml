@@ -96,7 +96,8 @@ jobs:
           mkdir build && cd build
           cmake ..
           make
-          sudo make install
+          echo "sdl?"
+          ls -la
 
       - name: Build binary
         run: |
@@ -149,6 +150,7 @@ jobs:
             tar -xzf "$f" -C dist/
           done
           echo "Contents of dist/:"
+          ls -la /
           ls -la artifacts/
           ls -la dist/
           ls -la latest/
