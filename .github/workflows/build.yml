@@ -80,6 +80,14 @@ jobs:
           echo "GOROOT=$(go env GOROOT)" >> $GITHUB_ENV
           echo "$(go env GOROOT)/bin" >> $GITHUB_PATH
 
+      - name: Install Kitware CMake
+        run: |
+          sudo apt install -y wget gnupg
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor -o /usr/share/keyrings/kitware-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main" | sudo tee /etc/apt/sources.list.d/kitware.list
+          sudo apt install -y --no-install-recommends cmake
+          sudo rm -rf /var/lib/apt/lists/*
+
       - name: Build SDL 1.2 compatibility layer
         run: |
           git clone https://github.com/libsdl-org/sdl12-compat.git
