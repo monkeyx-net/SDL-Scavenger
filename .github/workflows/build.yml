@@ -88,17 +88,6 @@ jobs:
           sudo apt install -y --no-install-recommends cmake
           sudo rm -rf /var/lib/apt/lists/*
 
-      - name: Build SDL 1.2 compatibility layer
-        run: |
-          git clone https://github.com/libsdl-org/sdl12-compat.git
-          cd sdl12-compat
-          git checkout release-1.2.64
-          mkdir build && cd build
-          cmake ..
-          make
-          echo "sdl?"
-          ls -la
-
       - name: Build binary
         run: |
           make
@@ -150,7 +139,6 @@ jobs:
             tar -xzf "$f" -C dist/
           done
           echo "Contents of dist/:"
-          ls -la /
           ls -la artifacts/
           ls -la dist/
           ls -la latest/
