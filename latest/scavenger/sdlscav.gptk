@@ -2,8 +2,8 @@ back = x
 back = add_alt
 start = space
 
-a = leftctrl
-b = leftalt
+a = leftalt
+b = leftctrl
 x = space
 y = f4
 
