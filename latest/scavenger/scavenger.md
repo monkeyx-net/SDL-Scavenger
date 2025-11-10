@@ -1,7 +1,7 @@
 ## Notes
-Thanks to Anseto for creating this game.
+Thanks to [barrymead](https://sourceforge.net/u/barrymead/profile/) and [mavati](https://sourceforge.net/u/mavati/profile/) for creating this game.
 
-[https://codeberg.org/anaseto/shamogu](https://codeberg.org/anaseto/shamogu)
+[https://sourceforge.net/projects/sdlscavenger/](https://sourceforge.net/projects/sdlscavenger/)
 
 
 ## Controls
@@ -10,16 +10,16 @@ Thanks to Anseto for creating this game.
 |--|--|
 | Dpad | Move |
 | Left Analog | Move|
-| Right Analog | Run |
-| A | Interact(Equip/Acivate) |
-| B | Inventory |
-| X | Examine |
-| Y | Answer Y |
-| L1 | View Messages |
-| L2 | Settings |
+| Right Analog | Move |
+| A | Dig Left |
+| B | Dig Right |
+| X | Space/Start |
+| Y | Pick Level |
+| L1 | Go to Previous Level  |
+| L2 | Go to Next Level |
 | R1 | Goto |
-| R2 | Wizard Mode|
+| R2 | Full Screen|
 
 ## Compiling
 
-Guthub Actions automatic [build](https://github.com/monkeyx-net/shamogu)
+Guthub Actions automatic [build](https://github.com/monkeyx-net/SDL-Scavenger/blob/main/.github/workflows/build.yml)
