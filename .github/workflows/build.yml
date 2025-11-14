@@ -11,6 +11,8 @@ env:
   GO_VERSION: 1.23
   SDL_VERSION: 2.30.2
   GAME_EXE: "sdlscav"
+  PORT_FILE: = "latest/scavenger/port.json"
+
 
 jobs:
   build:
@@ -44,7 +46,7 @@ jobs:
       - name: Parse port.json
         id: parse-json
         run: |
-          PORT_JSON_PATH="latest/scavenger/port.json"
+          PORT_JSON_PATH=$PORT_FILE
           if [ ! -f "$PORT_JSON_PATH" ]; then
             echo "Error: $PORT_JSON_PATH not found" && exit 1
           fi
