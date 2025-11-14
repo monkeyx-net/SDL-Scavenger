@@ -10,6 +10,8 @@ on:
 env:
   GO_VERSION: 1.23
   SDL_VERSION: 2.30.2
+vars:
+  GAME_EXE: "sdlscav"
 
 jobs:
   build:
@@ -51,7 +53,7 @@ jobs:
           GAME_NAME=$(jq -r '.attr.title' "$PORT_JSON_PATH")
           GAME_ZIP=$(jq -r '.name' "$PORT_JSON_PATH")
           GAME_START=$(jq -r '.items[0]' "$PORT_JSON_PATH")
-          GAME_EXE="sdlscav"
+          GAME_EXE="${{ vars.GAME_EXE }}"
           GAME_ICON="latest/$GAME_FOLDER/cover.png"
           echo "game_folder=$GAME_FOLDER" >> $GITHUB_OUTPUT
           echo "game_name=$GAME_NAME" >> $GITHUB_OUTPUT
