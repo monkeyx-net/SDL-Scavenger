@@ -23,6 +23,7 @@ void loadmap(unsigned char *map);
 void getcolors(void);
 void copyupxysize(int x,int y,int xsize,int ysize);
 void copyupxy(int x,int y);
+void copyuprects(SDL_Rect *rects,int count);
 void erasetile(int destx,int desty);
 void puttile(int destx,int desty,int source);
 void drawsquare(int destx,int desty,unsigned char *source);

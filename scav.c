@@ -5,6 +5,12 @@
 
 #include "scav.h"
 
+#define FPS_TEXT_LEN 7
+#define FPS_TEXT_X (IXSIZE - (FPS_TEXT_LEN * 8) - 4)
+#define FPS_TEXT_Y 4
+#define FPS_TEXT_W (FPS_TEXT_LEN * 8)
+#define FPS_TEXT_H 12
+
 char demolevel0[]={
 0x04,0x44,0x44,0x07,0x00,0x06,0x60,0x00,0x70,0x44,0x44,0x40,
 0x30,0x00,0x00,0x1a,0x00,0x06,0x60,0x00,0x11,0x00,0x00,0x03,
@@ -115,6 +121,11 @@ uchar statuswant[20];
 uchar bottomwant[73];
 uchar mtflag;
 uchar paused=0;
+uchar fpsEnabled=0;
+uchar fpsDirty=0;
+int fpsValue=0;
+int fpsFrames=0;
+uint32_t fpsLastTick=0;
 
 int oldmode;
 int wnum;
@@ -716,6 +727,43 @@ void writestring(uchar *str, int x, int y, int color)
    }
 }
 
+static void updatefps(void)
+{
+uint32_t now;
+
+   if(!fpsEnabled)
+   {
+      fpsLastTick=0;
+      fpsFrames=0;
+      return;
+   }
+   now=SDL_GetTicks();
+   if(!fpsLastTick)
+   {
+      fpsLastTick=now;
+      fpsFrames=0;
+   }
+   fpsFrames++;
+   if(now-fpsLastTick>=1000)
+   {
+      fpsValue=(int)((fpsFrames*1000U)/(now-fpsLastTick));
+      fpsLastTick=now;
+      fpsFrames=0;
+      fpsDirty=1;
+   }
+}
+
+static void renderfps(void)
+{
+uchar buf[16];
+
+   if(fpsEnabled)
+      sprintf((char *)buf,"FPS:%3d",fpsValue);
+   else
+      strcpy((char *)buf,"       ");
+   writestring(buf,FPS_TEXT_X,FPS_TEXT_Y,whitecolor);
+}
+
 void storesprites()
 {
 int i;
@@ -1290,6 +1338,8 @@ int mxloc,myloc;
 
 int iterate()
 {
+   int fpsNeedsUpdate=0;
+
    randcount2++;
    if(gottimer >= 1)gottimer = 0;
    resetinput();
@@ -1303,6 +1353,8 @@ int iterate()
 				quiet();
         return 1; /* alt-x */
 			}
+      if(paused || (gottimer < 1))
+         SDL_Delay(1);
    } while(paused || (gottimer < 1));
 
    mbuttons=(checkbutton(1) ? 1 : 0) | (checkbutton(3) ? 2 : 0);
@@ -1319,6 +1371,13 @@ int iterate()
    mxloc=xpos-BLOCKX/2;
    myloc=ypos-BLOCKY/2;
 
+   if(checkdown(SDLK_F6))
+   {
+      fpsEnabled^=1;
+      fpsDirty=1;
+   }
+   updatefps();
+
    restoresprites();
    animprocess();
    editprocess();
@@ -1330,6 +1389,12 @@ int iterate()
    changesprites();
    storesprites();
    drawsprites();
+   if(fpsDirty)
+   {
+      renderfps();
+      fpsDirty=0;
+      fpsNeedsUpdate=1;
+   }
    if(needwhole)
    {
       markpoint=marks;
@@ -1348,6 +1413,8 @@ int iterate()
          needbottomtext=0;
          copyupxysize(TEXTX,BOTTOMTEXTY,8*72,12);
       }
+      if(fpsNeedsUpdate)
+         copyupxysize(FPS_TEXT_X,FPS_TEXT_Y,FPS_TEXT_W,FPS_TEXT_H);
    }
    mode();
    if(checkdown(SDLK_SYSREQ))
@@ -2829,13 +2896,20 @@ void mark(int x,int y)
 void domarks()
 {
 int *ip,x,y;
+int count=0;
+SDL_Rect rects[MARKMAX/2];
    ip=marks;
    while(ip<markpoint)
    {
       x=*ip++;
       y=*ip++;
-      copyupxy(x,y);
+      rects[count].x=x;
+      rects[count].y=y;
+      rects[count].w=BLOCKX;
+      rects[count].h=BLOCKY;
+      count++;
    }
+   copyuprects(rects,count);
    markpoint=marks;
 }
 

@@ -409,6 +409,12 @@ void copyupxy(int x,int y)
 	gfxunlock();
 	SDL_UpdateRect(thescreen,x,y,BLOCKX,BLOCKY);
 }
+void copyuprects(SDL_Rect *rects,int count)
+{
+	if(count<=0) return;
+	gfxunlock();
+	SDL_UpdateRects(thescreen,count,rects);
+}
 
 void erasetile(int destx,int desty)
 {
