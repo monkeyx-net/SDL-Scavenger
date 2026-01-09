@@ -11,6 +11,9 @@
 #define FPS_TEXT_W (FPS_TEXT_LEN * 8)
 #define FPS_TEXT_H 12
 
+#define FRAME_MS 20
+#define WAKEUP_MS 1000
+
 char demolevel0[]={
 0x04,0x44,0x44,0x07,0x00,0x06,0x60,0x00,0x70,0x44,0x44,0x40,
 0x30,0x00,0x00,0x1a,0x00,0x06,0x60,0x00,0x11,0x00,0x00,0x03,
@@ -1339,11 +1342,18 @@ int mxloc,myloc;
 int iterate()
 {
    int fpsNeedsUpdate=0;
+   static uint32_t frameTick=0;
+   static uint32_t wakeupTick=0;
+   uint32_t now;
 
    randcount2++;
-   if(gottimer >= 1)gottimer = 0;
    resetinput();
 	 SDL_Delay(10);
+   now=SDL_GetTicks();
+   if(!wakeupTick)
+      wakeupTick=now+WAKEUP_MS;
+   if(!frameTick)
+      frameTick=now;
    do 
    {
       if ( scaninput() )
@@ -1353,9 +1363,14 @@ int iterate()
 				quiet();
         return 1; /* alt-x */
 			}
-      if(paused || (gottimer < 1))
+      now=SDL_GetTicks();
+      if(paused)
+         frameTick=now;
+      if(paused || now < wakeupTick || now-frameTick < FRAME_MS)
          SDL_Delay(1);
-   } while(paused || (gottimer < 1));
+    } while(paused || now < wakeupTick || now-frameTick < FRAME_MS);
+   while(now-frameTick >= FRAME_MS)
+      frameTick+=FRAME_MS;
 
    mbuttons=(checkbutton(1) ? 1 : 0) | (checkbutton(3) ? 2 : 0);
    mbuttons2=(checkbuttondown(1) ? 1 : 0) | (checkbuttondown(3) ? 2 : 0);
