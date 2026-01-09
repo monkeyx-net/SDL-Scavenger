@@ -194,9 +194,6 @@ int quit=0;
 			mousex=event.motion.x;
 			mousey=event.motion.y;
 			break;
-		case SDL_USEREVENT:
-			if (gottimer < 1)gottimer++;
-			break;
 #ifdef JOYSTICK_SUPPORT
 		case SDL_JOYAXISMOTION:
 			if ((event.jaxis.axis%2) == 0) {  /* left-right */

@@ -81,7 +81,6 @@ int NameEntryMode = 0;
 uchar bestname[20];
 int fallsound;
 int digsound;
-int gottimer = -50;   /* hold action for 1.0 seconds for screen to fully wake up */
 int	SoundEnable = 1;	/* Global to enable sound (Default on) off by cmd option */
 uchar needwhole=0,needtoptext=1,needbottomtext=1;
 
@@ -1718,32 +1717,12 @@ FILE *file;
    fclose(file);
    return 1;
 }
-unsigned char havepulse;
-static Uint32 sdlhandler(Uint32 time)
-{
-   SDL_Event timeevent;
-   
-   timeevent.type = SDL_USEREVENT;
-
-   hc++;
-
-   SDL_PeepEvents(&timeevent, 1, SDL_ADDEVENT, 0);
-
-   return time;
-}
-
 void pulseon(void)
 {
-   if(havepulse) return;
-   havepulse=1;
-   SDL_SetTimer(20,sdlhandler);
    hc=0;
 }
 void pulseoff(void)
 {
-   if(!havepulse) return;
-   havepulse=0;
-   SDL_SetTimer(0,NULL);
 }
 
 void scavfree(void)  /* Frees up all malloc'ed memory */

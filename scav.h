@@ -408,7 +408,6 @@ extern int skips[192];
 
 extern int mickeyx,mickeyy;
 extern int mx,my;
-extern int gottimer;
 extern int offscreen;
 extern int vp;
 extern int tileseg;
