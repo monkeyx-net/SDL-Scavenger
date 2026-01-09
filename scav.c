@@ -1364,9 +1364,23 @@ int iterate()
 			}
       now=SDL_GetTicks();
       if(paused)
+      {
          frameTick=now;
-      if(paused || now < wakeupTick || now-frameTick < FRAME_MS)
-         SDL_Delay(1);
+         SDL_Delay(10);
+      }
+      else if(now < wakeupTick || now-frameTick < FRAME_MS)
+      {
+         uint32_t wait;
+
+         if(now < wakeupTick)
+            wait=wakeupTick-now;
+         else
+            wait=FRAME_MS-(now-frameTick);
+         if(wait > 2)
+            SDL_Delay(wait-1);
+         else
+            SDL_Delay(0);
+      }
     } while(paused || now < wakeupTick || now-frameTick < FRAME_MS);
    while(now-frameTick >= FRAME_MS)
       frameTick+=FRAME_MS;
