@@ -1347,7 +1347,6 @@ int iterate()
 
    randcount2++;
    resetinput();
-	 SDL_Delay(10);
    now=SDL_GetTicks();
    if(!wakeupTick)
       wakeupTick=now+WAKEUP_MS;
@@ -1376,10 +1375,13 @@ int iterate()
             wait=wakeupTick-now;
          else
             wait=FRAME_MS-(now-frameTick);
-         if(wait > 2)
-            SDL_Delay(wait-1);
-         else
+         if(wait > 5)
+            SDL_Delay(wait-5);
+         do
+         {
             SDL_Delay(0);
+            now=SDL_GetTicks();
+         } while(now < wakeupTick || now-frameTick < FRAME_MS);
       }
     } while(paused || now < wakeupTick || now-frameTick < FRAME_MS);
    while(now-frameTick >= FRAME_MS)
