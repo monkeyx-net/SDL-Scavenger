@@ -128,7 +128,6 @@ uchar fpsDirty=0;
 int fpsValue=0;
 int fpsFrames=0;
 uint32_t fpsLastTick=0;
-int profileEnabled=0;
 
 int oldmode;
 int wnum;
@@ -1348,16 +1347,7 @@ int iterate()
    int fpsNeedsUpdate=0;
    static uint32_t frameTick=0;
    static uint32_t wakeupTick=0;
-   static uint32_t profLogic=0;
-   static uint32_t profRender=0;
-   static uint32_t profMisc=0;
-   static uint32_t profTotal=0;
-   static uint32_t profFrames=0;
    uint32_t now;
-   uint32_t prof_t0=0;
-   uint32_t prof_t1=0;
-   uint32_t prof_t2=0;
-   uint32_t prof_t3=0;
 
    randcount2++;
    resetinput();
@@ -1423,20 +1413,7 @@ int iterate()
       fpsEnabled^=1;
       fpsDirty=1;
    }
-   if(checkdown(SDLK_F7))
-   {
-      profileEnabled^=1;
-      profLogic=0;
-      profRender=0;
-      profMisc=0;
-      profTotal=0;
-      profFrames=0;
-      eprintf("Profiling %s\n",profileEnabled ? "on" : "off");
-   }
    updatefps();
-
-   if(profileEnabled)
-      prof_t0=SDL_GetTicks();
 
    restoresprites();
    animprocess();
@@ -1447,8 +1424,6 @@ int iterate()
    if(playing && mtflag) maketext();
    fixtext();
    changesprites();
-   if(profileEnabled)
-      prof_t1=SDL_GetTicks();
    storesprites();
    drawsprites();
    if(fpsDirty)
@@ -1496,34 +1471,9 @@ int iterate()
       }
       copyuprects(rects,rect_count);
    }
-   if(profileEnabled)
-      prof_t2=SDL_GetTicks();
    mode();
    if(checkdown(SDLK_SYSREQ))
       capturescreen();
-   if(profileEnabled)
-   {
-      prof_t3=SDL_GetTicks();
-      profLogic+=prof_t1-prof_t0;
-      profRender+=prof_t2-prof_t1;
-      profMisc+=prof_t3-prof_t2;
-      profTotal+=prof_t3-prof_t0;
-      profFrames++;
-      if(profFrames>=120)
-      {
-         eprintf("PROFILE avg %u frames: logic=%ums render=%ums misc=%ums total=%ums\n",
-            profFrames,
-            (unsigned)(profLogic/profFrames),
-            (unsigned)(profRender/profFrames),
-            (unsigned)(profMisc/profFrames),
-            (unsigned)(profTotal/profFrames));
-         profLogic=0;
-         profRender=0;
-         profMisc=0;
-         profTotal=0;
-         profFrames=0;
-      }
-   }
    return 0;
 }
 

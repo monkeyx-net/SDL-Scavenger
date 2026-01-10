@@ -433,8 +433,35 @@ void copyupxy(int x,int y)
 }
 void copyuprects(SDL_Rect *rects,int count)
 {
+	int i;
+	int minx, miny, maxx, maxy;
+	const int max_dirty_rects = 128;
+
 	if(count<=0) return;
 	gfxunlock();
+	if(count > max_dirty_rects)
+	{
+		minx = rects[0].x;
+		miny = rects[0].y;
+		maxx = rects[0].x + rects[0].w;
+		maxy = rects[0].y + rects[0].h;
+		for(i=1;i<count;i++)
+		{
+			if(rects[i].x < minx) minx = rects[i].x;
+			if(rects[i].y < miny) miny = rects[i].y;
+			if(rects[i].x + rects[i].w > maxx) maxx = rects[i].x + rects[i].w;
+			if(rects[i].y + rects[i].h > maxy) maxy = rects[i].y + rects[i].h;
+		}
+		{
+			SDL_Rect merged;
+			merged.x = minx;
+			merged.y = miny;
+			merged.w = maxx - minx;
+			merged.h = maxy - miny;
+			SDL_UpdateRects(thescreen,1,&merged);
+		}
+		return;
+	}
 	SDL_UpdateRects(thescreen,count,rects);
 }
 
