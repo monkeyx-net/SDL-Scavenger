@@ -11,7 +11,7 @@
 #define FPS_TEXT_W (FPS_TEXT_LEN * 8)
 #define FPS_TEXT_H 12
 
-#define FRAME_MS 20
+#define FRAME_MS 33 /* ~30 FPS */
 #define WAKEUP_MS 1000
 
 char demolevel0[]={
