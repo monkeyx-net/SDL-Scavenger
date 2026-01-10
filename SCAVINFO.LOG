@@ -1,2 +1,6 @@
-No /home/tim/.scavenger/levels.scl, setting one up...
-Trying to copy /home/tim/.scavenger......copied.
+Profiling on
+PROFILE avg 120 frames: logic=0ms render=0ms misc=0ms total=0ms
+PROFILE avg 120 frames: logic=0ms render=0ms misc=0ms total=0ms
+PROFILE avg 120 frames: logic=0ms render=0ms misc=0ms total=0ms
+PROFILE avg 120 frames: logic=0ms render=0ms misc=0ms total=0ms
+PROFILE avg 120 frames: logic=0ms render=0ms misc=15ms total=16ms
