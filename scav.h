@@ -507,7 +507,7 @@ extern void doenemies();
 extern void killenemy(struct entity *en);
 extern void movement();
 extern void mark(int x,int y);
-extern void domarks();
+extern int domarks(SDL_Rect *rects,int maxrects);
 extern void paintmode3();
 extern void tomode3();
 

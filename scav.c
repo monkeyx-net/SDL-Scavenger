@@ -1430,19 +1430,37 @@ int iterate()
       copyup();
    } else
    {
-      domarks();
+      SDL_Rect rects[MARKMAX/2+3];
+      int rect_count=0;
+
+      rect_count=domarks(rects,MARKMAX/2);
       if(needtoptext)
       {
          needtoptext=0;
-         copyupxysize(TEXTX,TOPTEXTY,8*72,12);
+         rects[rect_count].x=TEXTX;
+         rects[rect_count].y=TOPTEXTY;
+         rects[rect_count].w=8*72;
+         rects[rect_count].h=12;
+         rect_count++;
       }
       if(needbottomtext)
       {
          needbottomtext=0;
-         copyupxysize(TEXTX,BOTTOMTEXTY,8*72,12);
+         rects[rect_count].x=TEXTX;
+         rects[rect_count].y=BOTTOMTEXTY;
+         rects[rect_count].w=8*72;
+         rects[rect_count].h=12;
+         rect_count++;
       }
       if(fpsNeedsUpdate)
-         copyupxysize(FPS_TEXT_X,FPS_TEXT_Y,FPS_TEXT_W,FPS_TEXT_H);
+      {
+         rects[rect_count].x=FPS_TEXT_X;
+         rects[rect_count].y=FPS_TEXT_Y;
+         rects[rect_count].w=FPS_TEXT_W;
+         rects[rect_count].h=FPS_TEXT_H;
+         rect_count++;
+      }
+      copyuprects(rects,rect_count);
    }
    mode();
    if(checkdown(SDLK_SYSREQ))
@@ -2901,13 +2919,12 @@ void mark(int x,int y)
    }
 }
 
-void domarks()
+int domarks(SDL_Rect *rects,int maxrects)
 {
 int *ip,x,y;
 int count=0;
-SDL_Rect rects[MARKMAX/2];
    ip=marks;
-   while(ip<markpoint)
+   while(ip<markpoint && count<maxrects)
    {
       x=*ip++;
       y=*ip++;
@@ -2917,8 +2934,8 @@ SDL_Rect rects[MARKMAX/2];
       rects[count].h=BLOCKY;
       count++;
    }
-   copyuprects(rects,count);
    markpoint=marks;
+   return count;
 }
 
 void paintmode3()
