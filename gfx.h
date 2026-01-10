@@ -9,6 +9,7 @@ void markkey(int code,int status);
 void pollinput(void);
 void resetinput(void);
 int scaninput(void);
+int waitinput(void);
 void createinout(int num);
 int checkpressed(int code);
 int checkdown(int code);

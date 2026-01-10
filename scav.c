@@ -214,6 +214,9 @@ uchar *itake;
 uchar ibuff[IBUFFLEN];
 
 int bestdir,bestdist,aboveenemy,belowenemy,mask,thisdir,aboveplayer,belowplayer;
+int frameMs=FRAME_MS;
+
+void setint_dec(char *ip,int *op);
 
 void *configtab[]=
 {
@@ -227,6 +230,7 @@ void *configtab[]=
 "hero",gfxname1,setstring,
 "enemy",gfxname2,setstring,
 "hidden",gfxname3,setstring,
+"framems",&frameMs,setint_dec,
 0,0,0
 };
 
@@ -1352,6 +1356,8 @@ int iterate()
       wakeupTick=now+WAKEUP_MS;
    if(!frameTick)
       frameTick=now;
+   if(frameMs < 1)
+      frameMs=1;
    do 
    {
       if ( scaninput() )
@@ -1365,25 +1371,28 @@ int iterate()
       if(paused)
       {
          frameTick=now;
-         SDL_Delay(10);
+         if(waitinput())
+            return 1;
+         now=SDL_GetTicks();
+         frameTick=now;
       }
-      else if(now < wakeupTick || now-frameTick < FRAME_MS)
+      else if(now < wakeupTick || now-frameTick < (uint32_t)frameMs)
       {
          uint32_t wait;
 
          if(now < wakeupTick)
             wait=wakeupTick-now;
          else
-            wait=FRAME_MS-(now-frameTick);
+            wait=frameMs-(now-frameTick);
          if(wait > 0)
          {
             SDL_Delay(wait);
             now=SDL_GetTicks();
          }
       }
-    } while(paused || now < wakeupTick || now-frameTick < FRAME_MS);
-   while(now-frameTick >= FRAME_MS)
-      frameTick+=FRAME_MS;
+    } while(paused || now < wakeupTick || now-frameTick < (uint32_t)frameMs);
+   while(now-frameTick >= (uint32_t)frameMs)
+      frameTick+=frameMs;
 
    mbuttons=(checkbutton(1) ? 1 : 0) | (checkbutton(3) ? 2 : 0);
    mbuttons2=(checkbuttondown(1) ? 1 : 0) | (checkbuttondown(3) ? 2 : 0);
@@ -1494,6 +1503,11 @@ gfxset *gs;
 void setint(char *ip,int *op)
 {
    sscanf(ip,"%x",op);
+}
+
+void setint_dec(char *ip,int *op)
+{
+   sscanf(ip,"%d",op);
 }
 
 void setstring(char *ip,char *op)

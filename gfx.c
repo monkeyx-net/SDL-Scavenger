@@ -155,93 +155,118 @@ void resetinput(void)
 }
 
 #define SYSJOY_RANGE 3280
+static int handle_event(SDL_Event *event)
+{
+	int key,mod;
+	int bs=0;
+
+	switch(event->type)
+	{
+	case SDL_KEYDOWN:
+		key=event->key.keysym.sym;
+		mod=event->key.keysym.mod;
+		markkey(key,1);
+		break;
+	case SDL_KEYUP:
+		key=event->key.keysym.sym;
+		mod=event->key.keysym.mod;
+		markkey(key,0);
+		if(key == SDLK_PAUSE || (key == SDLK_p && NameEntryMode == 0)) paused^=1;
+		break;
+	case SDL_MOUSEBUTTONUP:
+		bs=~(1<<(event->button.button-1));
+		mousex=event->button.x;
+		mousey=event->button.y;
+		mouseb&=bs;
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		bs=1<<(event->button.button-1);
+		mousex=event->button.x;
+		mousey=event->button.y;
+		mouseb|=bs;
+		mousebd|=bs;
+		break;
+	case SDL_MOUSEMOTION:
+		mousex=event->motion.x;
+		mousey=event->motion.y;
+		break;
+#ifdef JOYSTICK_SUPPORT
+	case SDL_JOYAXISMOTION:
+		if ((event->jaxis.axis%2) == 0) {  /* left-right */
+			if (event->jaxis.value < -SYSJOY_RANGE) {  /* left */
+				markkey(leftkey,1);
+				markkey(rightkey,0);
+			}
+			else if (event->jaxis.value > SYSJOY_RANGE) {  /* right */
+				markkey(rightkey,1);
+				markkey(leftkey,0);
+			}
+			else {  /* center */
+				markkey(leftkey,0);
+				markkey(rightkey,0);
+			}
+		}
+		if ((event->jaxis.axis%2) == 1) {  /* up-down */
+			if (event->jaxis.value < -SYSJOY_RANGE) {  /* up */
+				markkey(upkey,1);
+				markkey(downkey,0);
+			}
+			else if (event->jaxis.value > SYSJOY_RANGE) {  /* down */
+				markkey(downkey,1);
+				markkey(upkey,0);
+			}
+			else {  /* center */
+				markkey(upkey,0);
+				markkey(downkey,0);
+			}
+		}
+		break;
+	case SDL_JOYBUTTONDOWN:
+	case SDL_JOYBUTTONUP:
+		{
+			int state = (event->type==SDL_JOYBUTTONDOWN)?1:0;
+			switch( event->jbutton.button )
+			{
+				case 0: markkey(digleftkey,state); break;
+				case 1: case 2: markkey(digrightkey,state); break;
+				default: markkey(SDLK_SPACE,state); break;
+			}
+		}	
+		break;
+#endif
+	case SDL_QUIT:
+		return 1;
+	}
+	return 0;
+}
+
 int scaninput(void)
 {
-SDL_Event event;
-int key,mod;
-int bs=0;
-int quit=0;
+	SDL_Event event;
+	int quit=0;
 
 	while(SDL_PollEvent(&event))
 	{
-		switch(event.type)
-		{
-		case SDL_KEYDOWN:
-			key=event.key.keysym.sym;
-			mod=event.key.keysym.mod;
-			markkey(key,1);
-			break;
-		case SDL_KEYUP:
-			key=event.key.keysym.sym;
-			mod=event.key.keysym.mod;
-			markkey(key,0);
-			if(key == SDLK_PAUSE || (key == SDLK_p && NameEntryMode == 0)) paused^=1;
-			break;
-		case SDL_MOUSEBUTTONUP:
-			bs=~(1<<(event.button.button-1));
-			mousex=event.button.x;
-			mousey=event.button.y;
-			mouseb&=bs;
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			bs=1<<(event.button.button-1);
-			mousex=event.button.x;
-			mousey=event.button.y;
-			mouseb|=bs;
-			mousebd|=bs;
-			break;
-		case SDL_MOUSEMOTION:
-			mousex=event.motion.x;
-			mousey=event.motion.y;
-			break;
-#ifdef JOYSTICK_SUPPORT
-		case SDL_JOYAXISMOTION:
-			if ((event.jaxis.axis%2) == 0) {  /* left-right */
-				if (event.jaxis.value < -SYSJOY_RANGE) {  /* left */
-					markkey(leftkey,1);
-					markkey(rightkey,0);
-				}
-				else if (event.jaxis.value > SYSJOY_RANGE) {  /* right */
-					markkey(rightkey,1);
-					markkey(leftkey,0);
-				}
-				else {  /* center */
-					markkey(leftkey,0);
-					markkey(rightkey,0);
-				}
-			}
-			if ((event.jaxis.axis%2) == 1) {  /* up-down */
-				if (event.jaxis.value < -SYSJOY_RANGE) {  /* up */
-					markkey(upkey,1);
-					markkey(downkey,0);
-				}
-				else if (event.jaxis.value > SYSJOY_RANGE) {  /* down */
-					markkey(downkey,1);
-					markkey(upkey,0);
-				}
-				else {  /* center */
-					markkey(upkey,0);
-					markkey(downkey,0);
-				}
-			}
-			break;
-		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYBUTTONUP:
-			{
-				int state = (event.type==SDL_JOYBUTTONDOWN)?1:0;
-				switch( event.jbutton.button )
-				{
-					case 0: markkey(digleftkey,state); break;
-					case 1: case 2: markkey(digrightkey,state); break;
-					default: markkey(SDLK_SPACE,state); break;
-				}
-			}	
-			break;
-#endif
-		case SDL_QUIT:
-			quit = 1;
-			break;
-		}
+		if(handle_event(&event))
+			quit=1;
+	}
+	return quit;
+}
+
+int waitinput(void)
+{
+	SDL_Event event;
+	int quit=0;
+
+	if(SDL_WaitEvent(&event))
+	{
+		if(handle_event(&event))
+			quit=1;
+	}
+	while(SDL_PollEvent(&event))
+	{
+		if(handle_event(&event))
+			quit=1;
 	}
 	return quit;
 }
