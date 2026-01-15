@@ -595,6 +595,7 @@ void paintlevel()
    int w;
    uchar v;
    uchar ttt[64];
+   gfxlock();
    p=levelbuff+30;
    for(j=0;j<LY;j++)
    {
@@ -641,6 +642,7 @@ void paintlevel()
    puttile(XOFF+24*24,YOFF-24,BORDERFIGS+2);
    puttile(XOFF+24*24,YOFF+15*24,BORDERFIGS+8);
    puttile(XOFF-24,YOFF+15*24,BORDERFIGS+6);
+   gfxunlock();
    if(playing)
    {
       if (recording)
@@ -692,6 +694,7 @@ int i,x,y;
 uchar ch,*p1,*p2;
 
    if(!playing) return;
+   gfxlock();
    p1=toptext;
    p2=topwant;
    i=72;
@@ -722,15 +725,18 @@ uchar ch,*p1,*p2;
       }
       x+=8;
    }
+   gfxunlock();
 }
 
 void writestring(uchar *str, int x, int y, int color)
 {
+   gfxlock();
    while(*str)
    {
       writechar(x,y,*str++ ,color);
       x+=8;
    }
+   gfxunlock();
 }
 
 static void updatefps(void)
@@ -774,6 +780,7 @@ void storesprites()
 {
 int i;
 struct sprite *p;
+   gfxlock();
    p=spritelist;
    for(i=0;i<MAXSPRITES;i++)
    {
@@ -784,12 +791,14 @@ struct sprite *p;
       }
       p++;
    }
+   gfxunlock();
 }
 
 void restoresprites()
 {
 int i;
 struct sprite *p;
+   gfxlock();
    p=spritelist;
    for(i=0;i<MAXSPRITES;i++)
    {
@@ -801,11 +810,13 @@ struct sprite *p;
       }
       p++;
    }
+   gfxunlock();
 }
 void drawsprites()
 {
 int i;
 struct sprite *p;
+   gfxlock();
    p=spritelist+MAXSPRITES;
    for(i=0;i<MAXSPRITES;i++)
    {
@@ -816,6 +827,7 @@ struct sprite *p;
          puttile(p->spritex,p->spritey,p->spritefig);
       }
    }
+   gfxunlock();
 }
 
 struct sprite *newsprite()

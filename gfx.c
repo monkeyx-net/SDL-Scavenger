@@ -485,7 +485,12 @@ void puttile(int destx,int desty,int source)
 {
 int i,j;
 unsigned char *p,*p2;
-	gfxlock();
+int should_unlock=0;
+	if(!locked && mustlock)
+	{
+		gfxlock();
+		should_unlock=1;
+	}
 	p=videomem+desty*stride+destx;
 	p2=figureblock+source*BLOCKX*BLOCKY;
 	for(i=0;i<BLOCKY;++i)
@@ -498,6 +503,8 @@ unsigned char *p,*p2;
 		}
 		p+=stride-BLOCKX;
 	}
+	if(should_unlock)
+		gfxunlock();
 }
 void drawsquare(int destx,int desty,unsigned char *source)
 {
@@ -517,8 +524,13 @@ void store(int x,int y,int which)
 {
 int i;
 unsigned char *p,*p2;
+int should_unlock=0;
 
-	gfxlock();
+	if(!locked && mustlock)
+	{
+		gfxlock();
+		should_unlock=1;
+	}
 	p=videomem+y*stride+x;
 	p2=storageblock+BLOCKX*BLOCKY*which;
 	for(i=0;i<BLOCKX;++i)
@@ -527,13 +539,20 @@ unsigned char *p,*p2;
 		p+=stride;
 		p2+=BLOCKX;
 	}
+	if(should_unlock)
+		gfxunlock();
 }
 void restore(int x,int y,int which)
 {
 int i;
 unsigned char *p,*p2;
+int should_unlock=0;
 
-	gfxlock();
+	if(!locked && mustlock)
+	{
+		gfxlock();
+		should_unlock=1;
+	}
 	p=videomem+y*stride+x;
 	p2=storageblock+BLOCKX*BLOCKY*which;
 	for(i=0;i<BLOCKX;++i)
@@ -542,6 +561,8 @@ unsigned char *p,*p2;
 		p+=stride;
 		p2+=BLOCKX;
 	}
+	if(should_unlock)
+		gfxunlock();
 }
 void gfxfetch(int num,int source, int dest)
 {
@@ -588,8 +609,13 @@ void writechar(int x,int y,uchar ch,unsigned char color) /* Added Color here */
 int ch2;
 int j,k,u,v,n;
 unsigned char *p,*p2,*tp,*tp2;
+int should_unlock=0;
 
-	gfxlock();
+	if(!locked && mustlock)
+	{
+		gfxlock();
+		should_unlock=1;
+	}
 	ch2=fmap[ch];
 	v=ch2/9;
 	u=ch2%9;
@@ -600,7 +626,7 @@ unsigned char *p,*p2,*tp,*tp2;
 	p=videomem+y*stride+x;
 	for(j=0;j<BLOCKY>>1;++j)
 	{
-      
+
       k = BLOCKX/3;
       tp = p; /* Temporary pointers */
       tp2 = p2;
@@ -611,11 +637,13 @@ unsigned char *p,*p2,*tp,*tp2;
             *tp++=color;
          else
             *tp++=blackcolor;
-      } 
+      }
       /*memcpy(p,p2,BLOCKX/3);*/
 		p+=stride;
 		p2+=BLOCKX;
 	}
+	if(should_unlock)
+		gfxunlock();
 }
 
 void drawfillrect(int x,int y,int size,int color)
