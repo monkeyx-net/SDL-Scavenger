@@ -1,5 +1,5 @@
 CC	= gcc
-CFLAGS	= -O2 `sdl-config --cflags`
+CFLAGS	= -O3 -march=native -ffast-math -funroll-loops `sdl-config --cflags`
 
 sdlscav:	scav.o gfx.o sound.o edit.o anim.o
 	gcc -o sdlscav scav.o gfx.o sound.o edit.o anim.o `sdl-config --libs`

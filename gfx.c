@@ -435,7 +435,7 @@ void copyuprects(SDL_Rect *rects,int count)
 {
 	int i;
 	int minx, miny, maxx, maxy;
-	const int max_dirty_rects = 128;
+	const int max_dirty_rects = 64;  /* Reduced from 128 for better merging on slow devices */
 
 	if(count<=0) return;
 	gfxunlock();
@@ -484,7 +484,7 @@ unsigned char *p;
 void puttile(int destx,int desty,int source)
 {
 int i,j;
-unsigned char *p,*p2;
+unsigned char *p,*p2,v;
 int should_unlock=0;
 	if(!locked && mustlock)
 	{
@@ -493,13 +493,17 @@ int should_unlock=0;
 	}
 	p=videomem+desty*stride+destx;
 	p2=figureblock+source*BLOCKX*BLOCKY;
+
+	/* Optimized: unroll inner loop to reduce branching overhead */
 	for(i=0;i<BLOCKY;++i)
 	{
-		for(j=0;j<BLOCKX;++j)
+		/* Process 4 pixels at a time to reduce loop overhead */
+		for(j=0;j<BLOCKX;j+=4)
 		{
-			if(*p2) *p=*p2;
-			++p2;
-			++p;
+			v=*p2++; if(v) *p=v; p++;
+			v=*p2++; if(v) *p=v; p++;
+			v=*p2++; if(v) *p=v; p++;
+			v=*p2++; if(v) *p=v; p++;
 		}
 		p+=stride-BLOCKX;
 	}
@@ -607,8 +611,8 @@ int i;
 void writechar(int x,int y,uchar ch,unsigned char color) /* Added Color here */
 {
 int ch2;
-int j,k,u,v,n;
-unsigned char *p,*p2,*tp,*tp2;
+int j,u,v,n;
+unsigned char *p,*p2,pixel;
 int should_unlock=0;
 
 	if(!locked && mustlock)
@@ -624,23 +628,20 @@ int should_unlock=0;
 	if(v&1) p2+=BLOCKX*BLOCKY>>1;
 	p2+=u%3 << 3;
 	p=videomem+y*stride+x;
+	/* BLOCKX/3 = 8 pixels per row, BLOCKY>>1 = 12 rows for text */
 	for(j=0;j<BLOCKY>>1;++j)
 	{
-
-      k = BLOCKX/3;
-      tp = p; /* Temporary pointers */
-      tp2 = p2;
-      /* Replaced the memcpy with a color version */
-      while (k--)
-      {
-         if (*tp2++)
-            *tp++=color;
-         else
-            *tp++=blackcolor;
-      }
-      /*memcpy(p,p2,BLOCKX/3);*/
-		p+=stride;
-		p2+=BLOCKX;
+		/* Unrolled: 8 pixels per text character row */
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		pixel=*p2++; *p++=(pixel?color:blackcolor);
+		p+=stride-8;
+		p2+=BLOCKX-8;
 	}
 	if(should_unlock)
 		gfxunlock();
