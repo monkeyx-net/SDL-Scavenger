@@ -70,8 +70,16 @@ void opengfx(int argc, char **argv)
 		SDL_WM_SetIcon(SDL_LoadBMP(temp), NULL);
 	SDL_WM_SetCaption( "SdlScavenger", "SdlScavenger" );
 
-	videoflags = SDL_SWSURFACE|SDL_HWPALETTE|ScavFullScreen;
+	/* Use hardware surface with double buffering for better performance on embedded devices */
+	videoflags = SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWPALETTE|ScavFullScreen;
 	thescreen = SDL_SetVideoMode(IXSIZE, IYSIZE, 8, videoflags);
+	/* Fallback to software if hardware not available */
+	if ( thescreen == NULL )
+	{
+		fprintf(stderr, "Hardware surface not available, trying software: %s\n", SDL_GetError());
+		videoflags = SDL_SWSURFACE|SDL_HWPALETTE|ScavFullScreen;
+		thescreen = SDL_SetVideoMode(IXSIZE, IYSIZE, 8, videoflags);
+	}
 	if ( thescreen == NULL )
 	{
 		fprintf(stderr, "Couldn't set display mode: %s\n",
@@ -362,7 +370,11 @@ void gfxunlock(void)
 void copyup(void)
 {
 	gfxunlock();
-	SDL_UpdateRect(thescreen, 0, 0, 0, 0);
+	/* Use SDL_Flip for double buffered surfaces, otherwise SDL_UpdateRect */
+	if(videoflags & SDL_DOUBLEBUF)
+		SDL_Flip(thescreen);
+	else
+		SDL_UpdateRect(thescreen, 0, 0, 0, 0);
 }
 void clear(void)
 {
@@ -424,21 +436,39 @@ void getcolors(void)
 void copyupxysize(int x,int y,int xsize,int ysize)
 {
 	gfxunlock();
-	SDL_UpdateRect(thescreen,x,y,xsize,ysize);
+	/* Use SDL_Flip for double buffered surfaces, otherwise SDL_UpdateRect */
+	if(videoflags & SDL_DOUBLEBUF)
+		SDL_Flip(thescreen);
+	else
+		SDL_UpdateRect(thescreen,x,y,xsize,ysize);
 }
 void copyupxy(int x,int y)
 {
 	gfxunlock();
-	SDL_UpdateRect(thescreen,x,y,BLOCKX,BLOCKY);
+	/* Use SDL_Flip for double buffered surfaces, otherwise SDL_UpdateRect */
+	if(videoflags & SDL_DOUBLEBUF)
+		SDL_Flip(thescreen);
+	else
+		SDL_UpdateRect(thescreen,x,y,BLOCKX,BLOCKY);
 }
 void copyuprects(SDL_Rect *rects,int count)
 {
 	int i;
 	int minx, miny, maxx, maxy;
-	const int max_dirty_rects = 64;  /* Reduced from 128 for better merging on slow devices */
+	/* Lower threshold for embedded devices - merge more aggressively */
+	const int max_dirty_rects = 16;
 
 	if(count<=0) return;
 	gfxunlock();
+
+	/* With double buffering, always flip the entire screen */
+	if(videoflags & SDL_DOUBLEBUF)
+	{
+		SDL_Flip(thescreen);
+		return;
+	}
+
+	/* For software surfaces, merge rects more aggressively on embedded hardware */
 	if(count > max_dirty_rects)
 	{
 		minx = rects[0].x;
